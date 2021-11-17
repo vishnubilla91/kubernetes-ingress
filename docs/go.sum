@@ -1,4 +1,4 @@
 github.com/jquery/jquery-dist v0.0.0-20210302171154-e786e3d9707f h1:VrcFwwDo/nKErNIKmp//iOGu7DlRkBTeW//hN7tl7SU=
 github.com/jquery/jquery-dist v0.0.0-20210302171154-e786e3d9707f/go.mod h1:/lTfttEqFU0GWTaOOMIeNTzLGQ7yTIgyzjtkS/pYIoc=
-gitlab.com/f5/nginx/controller/poc/f5-hugo v0.15.1 h1:NlB14mXQqZWK+7kPGa2T7nwnHoGWtP0W8DOFjr9S+0c=
-gitlab.com/f5/nginx/controller/poc/f5-hugo v0.15.1/go.mod h1:G+e4mnMJBHCT04TKm3Bbnm5I5OGVoeLlmbaDFF3GPBc=
+gitlab.com/f5/nginx/controller/poc/f5-hugo v0.15.3 h1:cDf5OAzX/6Qg2gbSJGAkMHHWOA1RDDigTKVBIGzR2Gw=
+gitlab.com/f5/nginx/controller/poc/f5-hugo v0.15.3/go.mod h1:G+e4mnMJBHCT04TKm3Bbnm5I5OGVoeLlmbaDFF3GPBc=
