@@ -189,7 +189,7 @@ def delete_test_namespaces(kube_apis, request) -> None:
         )
         delete_testing_namespaces(kube_apis.v1)
 
-    request.addfinalizer(fin)
+    # request.addfinalizer(fin)
 
 
 @pytest.fixture(scope="class")
@@ -229,7 +229,7 @@ def ingress_controller(cli_arguments, kube_apis, ingress_controller_prerequisite
             kube_apis.apps_v1_api, name, cli_arguments["deployment-type"], namespace
         )
 
-    request.addfinalizer(fin)
+    # request.addfinalizer(fin)
 
     return name
 
@@ -319,7 +319,7 @@ def ingress_controller_prerequisites(
         )
         cleanup_rbac(kube_apis.rbac_v1, rbac)
 
-    request.addfinalizer(fin)
+    # request.addfinalizer(fin)
 
     return IngressControllerPrerequisites(config_map, namespace)
 
@@ -501,7 +501,7 @@ def crd_ingress_controller(
             kube_apis.apps_v1_api, name, cli_arguments["deployment-type"], namespace
         )
 
-    request.addfinalizer(fin)
+    # request.addfinalizer(fin)
 
 
 @pytest.fixture(scope="class")
@@ -670,7 +670,7 @@ def crd_ingress_controller_with_ap(
             kube_apis.apps_v1_api, name, cli_arguments["deployment-type"], namespace
         )
 
-    request.addfinalizer(fin)
+    # request.addfinalizer(fin)
 
 
 class VirtualServerSetup:
@@ -743,7 +743,7 @@ def virtual_server_setup(
         if request.param.get("app_type"):
             delete_common_app(kube_apis, request.param["app_type"], test_namespace)
 
-    request.addfinalizer(fin)
+    # request.addfinalizer(fin)
 
     return VirtualServerSetup(
         ingress_controller_endpoint, test_namespace, vs_host, vs_name, vs_paths
@@ -810,7 +810,7 @@ def transport_server_setup(
         delete_items_from_yaml(kube_apis, service_file, test_namespace)
         delete_gc(kube_apis.custom_objects, gc_resource, "nginx-ingress")
 
-    request.addfinalizer(fin)
+    # request.addfinalizer(fin)
 
     ic_pod_name = get_first_pod_name(kube_apis.v1, ingress_controller_prerequisites.namespace)
     ic_namespace = ingress_controller_prerequisites.namespace
@@ -874,7 +874,7 @@ def v_s_route_app_setup(request, kube_apis, v_s_route_setup) -> None:
         delete_deployment(kube_apis.apps_v1_api, deployment_two, v_s_route_setup.route_s.namespace)
         delete_service(kube_apis.v1, svc_two, v_s_route_setup.route_s.namespace)
 
-    request.addfinalizer(fin)
+    # request.addfinalizer(fin)
 
 
 class VirtualServerRoute:
@@ -989,7 +989,7 @@ def v_s_route_setup(request, kube_apis, ingress_controller_endpoint) -> VirtualS
         delete_namespace(kube_apis.v1, ns_1)
         delete_namespace(kube_apis.v1, ns_2)
 
-    request.addfinalizer(fin)
+    # request.addfinalizer(fin)
 
     return VirtualServerRouteSetup(
         ingress_controller_endpoint, ns_1, vs_host, vs_name, route_m, route_s
@@ -1016,4 +1016,4 @@ def restore_configmap(request, kube_apis, ingress_controller_prerequisites, test
             f"{DEPLOYMENTS}/common/nginx-config.yaml",
         )
 
-    request.addfinalizer(fin)
+    # request.addfinalizer(fin)

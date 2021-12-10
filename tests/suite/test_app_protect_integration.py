@@ -93,7 +93,7 @@ def appprotect_setup(
         delete_items_from_yaml(kube_apis, src_sec_yaml, test_namespace)
         write_to_json(f"reload-{get_test_file_name(request.node.fspath)}.json", reload_times)
 
-    request.addfinalizer(fin)
+    # request.addfinalizer(fin)
 
     return AppProtectSetup(req_url, metrics_url)
 
@@ -297,6 +297,7 @@ class TestAppProtect:
         delete_items_from_yaml(kube_apis, src_ing_yaml, test_namespace)
         assert_valid_responses(response)
 
+    @pytest.mark.no_cleanup
     def test_ap_sec_logs_on(
         self,
         request,
@@ -333,9 +334,9 @@ class TestAppProtect:
             appprotect_setup.req_url + "/<script>", headers={"host": ingress_host}, verify=False
         )
         print(response_block.text)
-        log_contents = ""
+        log_contents_block = ""
         retry = 0
-        while "ASM:attack_type" not in log_contents and retry <= 60:
+        while "ASM:attack_type" not in log_contents_block and retry <= 20:
             log_contents_block = get_file_contents(
                 kube_apis.v1, log_loc, syslog_pod, test_namespace
             )
@@ -353,8 +354,8 @@ class TestAppProtect:
         wait_before_test(10)
         log_contents = get_file_contents(kube_apis.v1, log_loc, syslog_pod, test_namespace)
 
-        delete_items_from_yaml(kube_apis, src_ing_yaml, test_namespace)
-        delete_items_from_yaml(kube_apis, src_syslog_yaml, test_namespace)
+        # delete_items_from_yaml(kube_apis, src_ing_yaml, test_namespace)
+        # delete_items_from_yaml(kube_apis, src_syslog_yaml, test_namespace)
 
         assert_invalid_responses(response_block)
         assert (

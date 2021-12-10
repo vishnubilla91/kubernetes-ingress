@@ -116,7 +116,7 @@ def backend_setup(request, kube_apis, ingress_controller_endpoint, ingress_contr
                         ingress_controller_prerequisites.namespace,
                         f"{DEPLOYMENTS}/common/nginx-config.yaml")
 
-    request.addfinalizer(fin)
+    # request.addfinalizer(fin)
 
     return BackendSetup(ingress_host, ingress_controller_endpoint.public_ip, ingress_controller_endpoint.port_ssl)
 
