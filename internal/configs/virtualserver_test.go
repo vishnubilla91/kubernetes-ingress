@@ -5040,7 +5040,7 @@ func TestGenerateSplits(t *testing.T) {
 			Path:      "/internal_location_splits_1_split_0",
 			ProxyPass: "http://vs_default_cafe_coffee-v1",
 			Rewrites: []string{
-				"^ $request_uri",
+				"^ $request_uri_no_args",
 				fmt.Sprintf(`"^%v(.*)$" "/rewrite$1" break`, originalPath),
 			},
 			ProxyNextUpstream:        "error timeout",
@@ -5148,14 +5148,15 @@ func TestGenerateSplits(t *testing.T) {
 		"default",
 		vsc.warnings,
 	)
-	if !reflect.DeepEqual(resultSplitClient, expectedSplitClient) {
-		t.Errorf("generateSplits() returned \n%+v but expected \n%+v", resultSplitClient, expectedSplitClient)
+
+	if diff := cmp.Diff(expectedSplitClient, resultSplitClient); diff != "" {
+		t.Errorf("generateSplits() resultSplitClient mismatch (-want +got):\n%s", diff)
 	}
-	if !reflect.DeepEqual(resultLocations, expectedLocations) {
-		t.Errorf("generateSplits() returned \n%+v but expected \n%+v", resultLocations, expectedLocations)
+	if diff := cmp.Diff(expectedLocations, resultLocations); diff != "" {
+		t.Errorf("generateSplits() resultLocations mismatch (-want +got):\n%s", diff)
 	}
-	if !reflect.DeepEqual(resultReturnLocations, expectedReturnLocations) {
-		t.Errorf("generateSplits() returned \n%+v but expected \n%+v", resultReturnLocations, expectedReturnLocations)
+	if diff := cmp.Diff(expectedReturnLocations, resultReturnLocations); diff != "" {
+		t.Errorf("generateSplits() resultReturnLocations mismatch (-want +got):\n%s", diff)
 	}
 }
 
@@ -7281,16 +7282,19 @@ func TestGenerateRewrites(t *testing.T) {
 		originalPath string
 		grpcEnabled  bool
 		expected     []string
+		msg          string
 	}{
 		{
 			proxy:    nil,
 			expected: nil,
+			msg:      "action isn't proxy",
 		},
 		{
 			proxy: &conf_v1.ActionProxy{
 				RewritePath: "",
 			},
 			expected: nil,
+			msg:      "no rewrite is configured",
 		},
 		{
 			path: "/path",
@@ -7298,6 +7302,7 @@ func TestGenerateRewrites(t *testing.T) {
 				RewritePath: "/rewrite",
 			},
 			expected: nil,
+			msg:      "non-regex rewrite for non-internal location is not needed",
 		},
 		{
 			path:     "/_internal_path",
@@ -7306,7 +7311,8 @@ func TestGenerateRewrites(t *testing.T) {
 				RewritePath: "/rewrite",
 			},
 			originalPath: "/path",
-			expected:     []string{`^ $request_uri`, `"^/path(.*)$" "/rewrite$1" break`},
+			expected:     []string{`^ $request_uri_no_args`, `"^/path(.*)$" "/rewrite$1" break`},
+			msg:          "non-regex rewrite for internal location",
 		},
 		{
 			path:     "~/regex",
@@ -7315,7 +7321,8 @@ func TestGenerateRewrites(t *testing.T) {
 				RewritePath: "/rewrite",
 			},
 			originalPath: "/path",
-			expected:     []string{`^ $request_uri`, `"^/path(.*)$" "/rewrite$1" break`},
+			expected:     []string{`^ $request_uri_no_args`, `"^/path(.*)$" "/rewrite$1" break`},
+			msg:          "regex rewrite for internal location",
 		},
 		{
 			path:     "~/regex",
@@ -7324,6 +7331,7 @@ func TestGenerateRewrites(t *testing.T) {
 				RewritePath: "/rewrite",
 			},
 			expected: []string{`"^/regex" "/rewrite" break`},
+			msg:      "regex rewrite for non-internal location",
 		},
 		{
 			path:     "/_internal_path",
@@ -7333,7 +7341,8 @@ func TestGenerateRewrites(t *testing.T) {
 			},
 			originalPath: "/path",
 			grpcEnabled:  true,
-			expected:     []string{`^ $request_uri`, `"^/path(.*)$" "/rewrite$1" break`},
+			expected:     []string{`^ $request_uri_no_args`, `"^/path(.*)$" "/rewrite$1" break`},
+			msg:          "non-regex rewrite for internal location with grpc enabled",
 		},
 		{
 			path:         "/_internal_path",
@@ -7341,14 +7350,14 @@ func TestGenerateRewrites(t *testing.T) {
 			originalPath: "/path",
 			grpcEnabled:  true,
 			expected:     []string{`^ $request_uri break`},
+			msg:          "empty rewrite for internal location with grpc enabled",
 		},
 	}
 
 	for _, test := range tests {
 		result := generateRewrites(test.path, test.proxy, test.internal, test.originalPath, test.grpcEnabled)
-		if !reflect.DeepEqual(result, test.expected) {
-			t.Errorf("generateRewrites(%v, %v, %v, %v) returned \n %v but expected \n %v",
-				test.path, test.proxy, test.internal, test.originalPath, result, test.expected)
+		if diff := cmp.Diff(test.expected, result); diff != "" {
+			t.Errorf("generateRewrites() '%v' mismatch (-want +got):\n%s", test.msg, diff)
 		}
 	}
 }
